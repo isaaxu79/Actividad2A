@@ -131,7 +131,7 @@ def obtener_Paquete(indice):
             requerido=i
             break
         else:
-            print("sigue buscando")
+            print("")
     return requerido
 
 def validate_weight(hijitos, datos):
@@ -243,7 +243,6 @@ def validate_weight(hijitos, datos):
     return hijos_returned
 
 def validate_weight_mutation(datos, aMutar):
-    mutados_returned=[]
     a_retornar=[]
     valor1=datos[0]
     valor2=datos[1]
@@ -254,45 +253,9 @@ def validate_weight_mutation(datos, aMutar):
     for e in valor2:
         sumValor2+=e[1]
     if sumValor1 > tamanioContenedor:
-        print("primer hijo mutado no pasa")
+        intentos=0
         while sumValor1 > tamanioContenedor:
-            suma1=0
-            suma2=0
-            indice=0
-            for a in aMutar:
-                ans = bool(random.getrandbits(1))
-                if ans:
-                    for y in range(len(a)):
-                        if bool(random.getrandbits(1)):
-                            indexPackage = random.randint(1, 5)
-                            newPackage = obtener_Paquete(indexPackage)
-                            aMutar[indice][y] = newPackage 
-                        else:
-                            print("no muto el gen")
-                    mutados_returned.append(aMutar[indice])
-                indice+=1
-            aux = mutados_returned[0]
-            aux2 = mutados_returned[1]
-            for d in aux:
-                suma1+=d[1]
-            for e in aux2:
-                suma2+=e[1]
-            if suma1 <= tamanioContenedor:
-                sumValor1=suma1
-                a_retornar.append(aux)
-            else:
-                print("peso mutado 1 > container")
-                if suma2 <= tamanioContenedor:
-                    sumValor1=suma2
-                    a_retornar.append(aux2)
-                else:
-                    print("peso mutado 2 > container")   
-    else:
-        a_retornar.append(valor1)
-
-    if sumValor2 > tamanioContenedor:
-        print("segundo hijo mutado no pasa")
-        while sumValor2 > tamanioContenedor:
+            mutados_returned=[]
             suma1=0
             suma2=0
             indice=0
@@ -308,8 +271,9 @@ def validate_weight_mutation(datos, aMutar):
                             print("no muto el gen")
                     mutados_returned.append(aMutar[indice])
                 indice+=1
-            aux = mutados_returned[0]
-            aux2 = mutados_returned[1]
+            print("se mutaron asi ",aMutar)
+            aux = aMutar[0]
+            aux2 = aMutar[1]
             for d in aux:
                 suma1+=d[1]
             for e in aux2:
@@ -318,7 +282,45 @@ def validate_weight_mutation(datos, aMutar):
                 sumValor1=suma1
                 a_retornar.append(aux)
             else:
-                print("peso mutado 1 > container")
+                if suma2 <= tamanioContenedor:
+                    sumValor1=suma2
+                    a_retornar.append(aux2)
+                else:
+                    print("peso mutado 2 > container")   
+            intentos+=1
+    else:
+        a_retornar.append(valor1)
+
+    if sumValor2 > tamanioContenedor:
+        while sumValor2 > tamanioContenedor:
+            mutados_returned=[]
+            suma1=0
+            suma2=0
+            indice=0
+            for a in aMutar:
+                ans = bool(random.getrandbits(1))
+                if ans:
+                    for y in range(len(a)):
+                        if bool(random.getrandbits(1)):
+                            indexPackage = random.randint(1, 5)
+                            newPackage = obtener_Paquete(indexPackage)
+                            aMutar[indice][y] = newPackage
+                        else:
+                            print("no muto el gen")
+                    mutados_returned.append(aMutar[indice])
+                indice+=1
+            print("se mutaron asi ",aMutar)
+            print(aMutar)
+            aux = aMutar[0]
+            aux2 = aMutar[1]
+            for d in aux:
+                suma1+=d[1]
+            for e in aux2:
+                suma2+=e[1]
+            if suma1 <= tamanioContenedor:
+                sumValor1=suma1
+                a_retornar.append(aux)
+            else:
                 if suma2 <= tamanioContenedor:
                     sumValor1=suma2
                     a_retornar.append(aux2)
@@ -381,7 +383,7 @@ def mostrar_Paquetes_a_enviar():
             sumaCostos += x[0]
             sumaPeso += x[1]
         f+=1
-        print("individuo",f,".-", i, "pesa = ", sumaPeso," ---- suma de costos= ", sumaCostos)
+        print("individuo a enviar ",f,".-", i, "pesa = ", sumaPeso," ---- suma de costos= ", sumaCostos)
 
 def generateGraphic(x,y,z):
    plt.plot(x, label = "Mejor Caso")   # Dibuja el gráfico
@@ -415,10 +417,8 @@ if __name__ == "__main__":
         paquetesElegidos+=2
         crossover_data=crossover(poblation)
         mutation_data=mutation(crossover_data)
-        print("hijo 1 muto como: ",mutation_data[0])
-        print("hijo 2 muto como: ",mutation_data[1])
         poblation.extend(mutation_data)
-    print(paquetes_a_enviar)
+    mostrar_Paquetes_a_enviar()
     generateGraphic(mejorfit_gen, peorfit_gen, promfit_gen)
 
         
