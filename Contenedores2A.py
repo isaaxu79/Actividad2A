@@ -125,13 +125,14 @@ def mutation(datos):
     return datos
 
 def obtener_Paquete(indice):
+    value=0
     for i in packages:
         peso=i[1]
         if(indice == peso):
             requerido=i
             break
         else:
-            print("")
+            value+=1
     return requerido
 
 def validate_weight(hijitos, datos):
@@ -254,7 +255,7 @@ def validate_weight_mutation(datos, aMutar):
         sumValor2+=e[1]
     if sumValor1 > tamanioContenedor:
         intentos=0
-        while sumValor1 > tamanioContenedor:
+        while sumValor1 > tamanioContenedor or intentos < 10 :
             mutados_returned=[]
             suma1=0
             suma2=0
@@ -292,7 +293,8 @@ def validate_weight_mutation(datos, aMutar):
         a_retornar.append(valor1)
 
     if sumValor2 > tamanioContenedor:
-        while sumValor2 > tamanioContenedor:
+        intentos2 =0
+        while sumValor2 > tamanioContenedor or intentos2 < 10:
             mutados_returned=[]
             suma1=0
             suma2=0
@@ -326,6 +328,7 @@ def validate_weight_mutation(datos, aMutar):
                     a_retornar.append(aux2)
                 else:
                     print("peso mutado 2 > container")
+            intentos2+=1
     else:
         a_retornar.append(valor2)
     return a_retornar
