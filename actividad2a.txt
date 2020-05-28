@@ -1,0 +1,14 @@
+Actividad 2A
+
+Tamaño del contenedor: definido por el usuario (TAMAÑO TIENE QUE SER MENOR A LA SUMA DE LOS PAQUETES A ENVIAR)
+Numero de paquetes: aleatorios o asignados por el usuario - ALEATORIOS
+ALEATORIO TIPO DE PAQUETES A ENVIAR
+PAQUETES:
+Valor o costo de los paquetes: rango del 1 al 20 (aleatorios?) - va a ser fijo ESTA COSA
+Peso o espacio de los paquetes: rango del 1 al 5 (este valor se define por el tamaño del contenedor, tomando en cuenta que se puede repetir los valores) - va a aser fijo ESTA COSA
+Tamaño de la poblacion: definida por el usuario y se genera de manera aleatoria
+SELECCION:
+se definira por la suma del costo de los paquetes en el contenedor, cuidando de que el peso no sobrepase la capacidad de dicho contenedor, debe ser menor o igual. Se seleccionaran los individuos con la suma maxima de ganancia.
+CRUZA: 
+tengo pensado usar el single point crossover, primero verificar si el tamaño de los paquetes es par o impar, si lo es, generar un numero aleatorio de rango 1 al tamaño del arreglo-2(o tambien -1) y apartir de ese generar el corte
+MUTACION:
