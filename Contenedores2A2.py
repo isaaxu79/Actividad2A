@@ -1,15 +1,16 @@
 from random import randint
+from tkinter import *
 import random
 import math 
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-pesoPaquete1 = 1
-pesoPaquete2 = 2
-pesoPaquete3 = 3
-pesoPaquete4 = 4
-pesoPaquete5 = 5
+paquete1=[]
+paquete2=[]
+paquete3=[]
+paquete4=[]
+paquete5=[]
 initial_population=[]
 aux=[]
 packages=[]
@@ -22,6 +23,10 @@ promfit_gen=[]
 prob_wheel_roulette=[]
 aux_fitness=[]
 paquetes_a_enviar=[]
+send_package=[]
+requerido=[]
+mosMejoresGen=[]
+envio=[]
 
 def seleccion(initial_population):
     global aux_fitness
@@ -34,6 +39,7 @@ def seleccion(initial_population):
     best2_retorno=[]
     evaluar_esto=[]
     z=0
+
     for x in initial_population:
         auxiliar= initial_population[z]
         sumaCostos=0
@@ -42,11 +48,13 @@ def seleccion(initial_population):
         z+=1
         aux_fitness.append(sumaCostos)
         evaluar_esto.append([x, sumaCostos])
+
+    
     suma_fitness=sum(aux_fitness)
     prom_fitness=suma_fitness/(len(initial_population))
-    print("suma fitness " ,suma_fitness)
-    print("promedio fitness " , prom_fitness)
-    print("maximo fitness " , max(aux_fitness))
+    #print("suma fitness " ,suma_fitness)
+    #print("promedio fitness " , prom_fitness)
+    #print("maximo fitness " , max(aux_fitness))
     for y in aux_fitness:
         prob_individual = y/suma_fitness
         prob_wheel_roulette.append(prob_individual)
@@ -60,7 +68,8 @@ def seleccion(initial_population):
     promfit_gen.append(prom_fitness)
     aux_fitness.sort()
     tamanio_auxfit = len(aux_fitness)
-    best_retorno=aux_fitness[tamanio_auxfit-1]
+
+    best_retorno=max(aux_fitness)
     best2_retorno=aux_fitness[tamanio_auxfit-2]
 
     for pero in evaluar_esto:
@@ -70,6 +79,10 @@ def seleccion(initial_population):
         if pero[1] == best2_retorno:
             best2_retorno=pero[0]
             retorno_gen.append(best2_retorno)
+    print(best_retorno, best2_retorno)
+
+    send_package.append(max(aux_fitness))
+    envio.append(best_retorno)
     paquetes_a_enviar.extend([best_retorno, best2_retorno])
     return retorno_gen
 
@@ -85,8 +98,8 @@ def crossover(datos):
     mitadDos1 = valor2[:puntoCorte2]
     mitadDos2 = valor2[puntoCorte2:]
 
-    print("partidos padre 1", mitaduno1, " - - - - - ", mitaduno2)
-    print("partidos padre 2", mitadDos1, " - - - - - ", mitadDos2)
+    #print("partidos padre 1", mitaduno1, " - - - - - ", mitaduno2)
+    #print("partidos padre 2", mitadDos1, " - - - - - ", mitadDos2)
     hijo1=[]
     hijo2=[]
     hijitos=[]
@@ -100,41 +113,40 @@ def crossover(datos):
     hijitos.append(hijo1)
     hijitos.append(hijo2)
     data_returned = validate_weight(hijitos, entran)
-    print("padre 1 entro como: ",entran[0])
-    print("padre 2 entro como: ",entran[1])
-    print("hijo 1 salio como: ",data_returned[0])
-    print("hijo 2 salio como: ",data_returned[1])
+    #print("padre 1 entro como: ",entran[0])
+    #print("padre 2 entro como: ",entran[1])
+    #print("hijo 1 salio como: ",data_returned[0])
+    #print("hijo 2 salio como: ",data_returned[1])
 
     return data_returned
 
 def mutation(datos):
     aMutar=datos
     indice=0
+    #print("entran a mutar asi = ",datos)
     for a in datos:
         ans = bool(random.getrandbits(1))
         if ans:
             for y in range(len(a)):
-                tamano = len(a) -2
-                veces=0
-                while veces < tamano:
-                    if bool(random.getrandbits(1)):
-                        indexPackage = random.randint(1, 5)
-                        newPackage = obtener_Paquete(indexPackage)
-                        datos[indice][y] = newPackage   
-                    else:
-                        print("no muto el gen")
-                    veces+=1
+                if bool(random.getrandbits(1)):
+                    peso = datos[indice][y][1]
+                    #print("peso",peso)
+                    indexPackage = random.randint(1, peso)
+                    newPackage = obtener_Paquete(indexPackage)
+                    datos[indice][y] = newPackage   
+                else:
+                    print("")
         indice+=1
-    validate_weight_mutation(datos, aMutar)
+    #print("salen de mutar asi = ",datos)
     return datos
 
 def obtener_Paquete(indice):
+    global requerido
     value=0
     for i in packages:
         peso=i[1]
         if(indice == peso):
             requerido=i
-            break
         else:
             value+=1
     return requerido
@@ -143,6 +155,7 @@ def validate_weight(hijitos, datos):
     hijos_returned=[]
     valor1=hijitos[0]
     valor2=hijitos[1]
+    #print("entran a validar = ", valor1, " - ", valor2)
     sumValor1=0
     sumValor2=0
     for d in valor1:
@@ -150,7 +163,7 @@ def validate_weight(hijitos, datos):
     for e in valor2:
         sumValor2+=e[1]
     if sumValor1 > tamanioContenedor:
-        print("primero hijo cruzado no paso")
+        #print("primero hijo cruzado no paso")
         while sumValor1 > tamanioContenedor:
 
             puntoCorte1=randint(1,len(datos[0])-1)
@@ -164,41 +177,27 @@ def validate_weight(hijitos, datos):
             mitadDos1 = valor2[:puntoCorte2]
             mitadDos2 = valor2[puntoCorte2:]
 
-            print("partido padre 1", mitaduno1, " - - - - - ", mitaduno2)
-            print("partido padre 2", mitadDos1, " - - - - - ", mitadDos2)
+            #print("partido padre 1", mitaduno1, " - - - - - ", mitaduno2)
+            #print("partido padre 2", mitadDos1, " - - - - - ", mitadDos2)
             hijo1=[]
             hijo2=[]
-            hijitos=[]
 
             hijo1.extend(mitaduno1)
             hijo1.extend(mitadDos2)
 
-            hijo2.extend(mitadDos1)
-            hijo2.extend(mitaduno2)
-
             auxvalor1=0
-            auxvalor2=0
             for d in hijo1:
                 auxvalor1+=d[1]
-            for e in hijo2:
-                auxvalor2+=e[1]
             if auxvalor1 <= tamanioContenedor:
-                hijitos.append(hijo1)
                 sumValor1=auxvalor1
                 hijos_returned.append(hijo1)
             else: 
-                print("peso hijo 1 > container")
-                if auxvalor2 <= tamanioContenedor:
-                    hijitos.append(hijo2)
-                    sumValor1=auxvalor2
-                    hijos_returned.append(hijo2)
-                else:
-                    print("peso hijo 2 > container")
+                print("")
     else:
         hijos_returned.append(valor1)
 
     if sumValor2 > tamanioContenedor:
-        print("segundo hijo cruzado no paso")
+        #print("segundo hijo cruzado no paso")
         while sumValor2 > tamanioContenedor:
 
             puntoCorte1=randint(1,len(datos[0])-1)
@@ -212,8 +211,8 @@ def validate_weight(hijitos, datos):
             mitadDos1 = valor2[:puntoCorte2]
             mitadDos2 = valor2[puntoCorte2:]
 
-            print("partidos padres 1", mitaduno1, " - - - - - ", mitaduno2)
-            print("partidos padres 2", mitadDos1, " - - - - - ", mitadDos2)
+            #print("partidos padres 1", mitaduno1, " - - - - - ", mitaduno2)
+            #print("partidos padres 2", mitadDos1, " - - - - - ", mitadDos2)
 
             hijo1=[]
             hijo2=[]
@@ -224,122 +223,17 @@ def validate_weight(hijitos, datos):
             hijo2.extend(mitadDos1)
             hijo2.extend(mitaduno2)
 
-            auxvalor1=0
             auxvalor2=0
-            for d in hijo1:
-                auxvalor1+=d[1]
             for e in hijo2:
                 auxvalor2+=e[1]
-            if auxvalor1 <= tamanioContenedor:
-                hijitos.append(hijo1)
-                sumValor2=auxvalor1
-                hijos_returned.append(hijo1)
-            else: 
-                print("peso hijo 1 > container")
-                if auxvalor2 <= tamanioContenedor:
-                    hijitos.append(hijo2)
-                    sumValor2=auxvalor2
-                    hijos_returned.append(hijo2)
-                else:
-                    print("peso hijo 2 > container")
-        
+            if auxvalor2 <= tamanioContenedor:
+                sumValor2=auxvalor2
+                hijos_returned.append(hijo2)
+            else:
+                print("")     
     else:
         hijos_returned.append(valor2)
     return hijos_returned
-
-def validate_weight_mutation(datos, aMutar):
-    a_retornar=[]
-    valor1=datos[0]
-    valor2=datos[1]
-    sumValor1=0
-    sumValor2=0
-    for d in valor1:
-        sumValor1+=d[1]
-    for e in valor2:
-        sumValor2+=e[1]
-    if sumValor1 > tamanioContenedor:
-        intentos=0
-        while sumValor1 > tamanioContenedor or intentos < 30 :
-            mutados_returned=[]
-            suma1=0
-            suma2=0
-            indice=0
-            for a in aMutar:
-                ans = bool(random.getrandbits(1))
-                if ans:
-                    for y in range(len(a)):
-                        if bool(random.getrandbits(1)):
-                            indexPackage = random.randint(1, 5)
-                            newPackage = obtener_Paquete(indexPackage)
-                            aMutar[indice][y] = newPackage
-                        else:
-                            print("no muto el gen")
-                    mutados_returned.append(aMutar[indice])
-                indice+=1
-            print("se mutaron asi ",aMutar)
-            aux = aMutar[0]
-            aux2 = aMutar[1]
-            for d in aux:
-                suma1+=d[1]
-            for e in aux2:
-                suma2+=e[1]
-            if suma1 <= tamanioContenedor:
-                sumValor1=suma1
-                a_retornar.append(aux)
-            else:
-                if suma2 <= tamanioContenedor:
-                    sumValor1=suma2
-                    a_retornar.append(aux2)
-                else:
-                    print("peso mutado 2 > container")   
-            intentos+=1
-        else:
-            a_retornar.append(aMutar[0])
-    else:
-        a_retornar.append(valor1)
-
-    if sumValor2 > tamanioContenedor:
-        intentos2 =0
-        while sumValor2 > tamanioContenedor or intentos2 < 30:
-            mutados_returned=[]
-            suma1=0
-            suma2=0
-            indice=0
-            for a in aMutar:
-                ans = bool(random.getrandbits(1))
-                if ans:
-                    for y in range(len(a)):
-                        if bool(random.getrandbits(1)):
-                            indexPackage = random.randint(1, 5)
-                            newPackage = obtener_Paquete(indexPackage)
-                            aMutar[indice][y] = newPackage
-                        else:
-                            print("no muto el gen")
-                    mutados_returned.append(aMutar[indice])
-                indice+=1
-            print("se mutaron asi ",aMutar)
-            print(aMutar)
-            aux = aMutar[0]
-            aux2 = aMutar[1]
-            for d in aux:
-                suma1+=d[1]
-            for e in aux2:
-                suma2+=e[1]
-            if suma1 <= tamanioContenedor:
-                sumValor1=suma1
-                a_retornar.append(aux)
-            else:
-                if suma2 <= tamanioContenedor:
-                    sumValor1=suma2
-                    a_retornar.append(aux2)
-                else:
-                    print("peso mutado 2 > container")
-            intentos2+=1
-        else:
-            a_retornar.append(aMutar[1])
-    else:
-        a_retornar.append(valor2)
-    return a_retornar
     
 def generate_population(paquetesIniciales):
     while len(initial_population) < paquetesIniciales:
@@ -351,19 +245,19 @@ def generate_population(paquetesIniciales):
             suma += n[1]
             seleccionado.append(n)
         if suma > tamanioContenedor:
-            print("peso > contenedor")
+            print("")
         else:
             initial_population.extend([seleccionado])
         
 def generate_packages():
     while len(aux) < 5:
         i=0
-        indice = random.randint(1, 10)
+        indice = random.randint(1, 20)
         if len(aux) == 0:
             aux.extend([indice])
         else:
             if indice in aux:
-                print("numero repetido")
+                print("")
             else:
                 aux.extend([indice])
     aux.sort()
@@ -386,8 +280,8 @@ def mostrar_Poblacion():
 def mostrar_Paquetes_a_enviar():
     f=0
     costos=0
-    for i in paquetes_a_enviar:
-        costos = paquetes_a_enviar[f] 
+    for i in envio:
+        costos = envio[f] 
         sumaCostos=0
         sumaPeso=0
         for x in costos:
@@ -395,6 +289,7 @@ def mostrar_Paquetes_a_enviar():
             sumaPeso += x[1]
         f+=1
         print("individuo a enviar ",f,".-", i, "pesa = ", sumaPeso," ---- suma de costos= ", sumaCostos)
+
 
 def generateGraphic(x,y,z):
    plt.plot(x, label = "Mejor Caso")   # Dibuja el gráfico
@@ -412,16 +307,42 @@ def generateGraphic(x,y,z):
    plt.show()   # Fuerza dibujo de datos de lista3
 
 def genereteGraphicPackages():
-    x = np.arrange(7)
-    y1 = np.random.randint(1,10,7)
-    y2 = np.random.randint(1,10,7)
-    y3 = np.random.randint(1,10,7)
-    fig, ax = plt.subplots()
-    ax.bar(x, y1, label= " paquete 1")
-    ax.bar(x, y2, bottom = y1, label = "paquete 2")
-    ax.bar(x, y3, bottom = y1 + y2, label = "paquete 3")
-    ax.legend(loc=(1.1,0.8))
-    plt.show()
+    paquete1=packages[0]
+    paquete2=packages[1]
+    paquete3=packages[2]
+    paquete4=packages[3]
+    paquete5=packages[4]
+    valor1="1 Valor: " + str(paquete1[0]) + " - Peso: " + str(paquete1[1])
+    valor2="2 Valor: " + str(paquete2[0]) + " - Peso: " + str(paquete2[1])
+    valor3="3 Valor: " + str(paquete3[0]) + " - Peso: " + str(paquete3[1])
+    valor4="4 Valor: " + str(paquete4[0]) + " - Peso: " + str(paquete4[1])
+    valor5="5 Valor: " + str(paquete5[0]) + " - Peso: " + str(paquete5[1])
+
+    root=Tk()
+    scrollbar = Scrollbar(root)
+    scrollbar.pack(side=RIGHT, fill =Y)
+
+    miFrame=Frame(root, width=1300, height=550)
+    miFrame.pack()
+
+    Label(miFrame, text="Valores de paquetes").place(x = 5, y =5)
+    Label(miFrame, text=valor1+"\n"+valor2+"\n"+valor3+"\n"+valor4+"\n"+valor5+"\n").place(x=5, y=25)
+
+    equis= 10
+    ye = 120
+    indice=0
+    texto=""
+    costo=0
+    for i in envio:
+        for j in range(len(i)):
+            costo+=envio[indice][j][1]
+            texto += "["+str(envio[indice][j])+"], "  
+        Label(miFrame, text="Paquete "+ str(indice+1)+" = " +texto + " Costo: " + str(costo), font=("Comic Sans MS", 10)).place(x= equis, y=ye)
+        ye+=25
+        indice+=1
+        texto=""
+        costo=0
+    root.mainloop()
 
 if __name__ == "__main__":
     tamanioContenedor = int (input("Tamano del contenedor: "))
@@ -437,12 +358,15 @@ if __name__ == "__main__":
         i+=1
         print("Generacion no. ",i)
         poblation = seleccion(poblation)
-        paquetesElegidos+=2
         crossover_data=crossover(poblation)
         mutation_data=mutation(crossover_data)
         poblation.extend(mutation_data)
-    mostrar_Paquetes_a_enviar()
-    generateGraphic(mejorfit_gen, peorfit_gen, promfit_gen)
-    #genereteGraphicPackages()
+        paquetesElegidos+=1
+    #mostrar_Paquetes_a_enviar()
+    # send_package = send_package[::-1]
+    # peorfit_gen = peorfit_gen[::-1]
+    # promfit_gen = promfit_gen[::-1]
+    generateGraphic(send_package, peorfit_gen, promfit_gen)
+    genereteGraphicPackages()
 
         
